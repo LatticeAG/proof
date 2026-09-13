@@ -1,0 +1,32 @@
+# Spec and coordinator artifacts — never tracked in the build repo
+SPEC*
+*EXTREME*
+PROMPT*
+*PROMPT*
+REVIEW*
+FIX_PROMPT*
+SELFREVIEW*
+DRAFT*
+REPORT*
+INTERFACES*
+STATUS*
+
+# Build outputs and dependencies
+node_modules/
+dist/
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+
+# Native helper build artifacts
+native/peercred
+
+# Local runtime state
+*.sock
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.log
+.proof/
+tmp/

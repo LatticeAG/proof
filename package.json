@@ -1,0 +1,31 @@
+{
+  "name": "@latticeag/proof",
+  "version": "0.1.0",
+  "description": "LatticeAG Proof zone core: hash-chained receipts and lineage that reconstruct the disclosed, signed record of work — verifiable without re-trusting the producing operator.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "bin": {
+    "proof": "bin/proof"
+  },
+  "files": [
+    "dist",
+    "bin",
+    "native"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "build:native": "cc -O2 -Wall -Wextra -o native/peercred native/peercred.c",
+    "test": "npm run build && node --test dist/test/*.test.js",
+    "conformance": "npm run build && node --test dist/test/vectors.test.js",
+    "test:py": "python3 -m unittest discover -s py/tests -v",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.4",
+    "typescript": "^5.9.3"
+  }
+}
