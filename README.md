@@ -38,7 +38,8 @@ surfaces are defined interfaces that fail closed or report
 ```sh
 npm ci
 npm run build          # TypeScript → dist/
-npm run build:native   # cc → native/peercred (Linux SO_PEERCRED helper)
+npm run build:native   # cc → native/peercred (Linux SO_PEERCRED helper —
+                       # required by `serve` for caller identity)
 npm test               # 72 tests: 60 spec conformance vectors + 12 core
 npm run conformance    # the 60-vector conformance suite alone
 npm run test:py        # Python verifier parity suite
@@ -46,21 +47,39 @@ npm run lint           # tsc --noEmit
 ```
 
 Requires Node.js ≥ 22.5 (`node:sqlite`), a C compiler for the peer-credential
-helper, and Python ≥ 3.11 with `cryptography` for the Python suite.
+helper, and Python ≥ 3.10 with `cryptography` for the Python suite.
 
 ## Quick start
 
+The JSON inputs (`proof.json` config, `trust.json`, `source.json`,
+`batch.json`) are operator-maintained files — the config's closed schema is
+in `src/config.ts`; `test/fixture.ts` builds the exact shapes the
+conformance suite uses. `init` signs the genesis audit with the config's
+`audit_key_file`, requires `--trust` (its `heads` may pin only genesis-zero
+heads at init) and a `--principal` that is a configured `admin` in the
+config's `principals[]`:
+
 ```sh
-proof init --config proof.json            # create workspace store + genesis audit
+proof init --config proof.json --trust trust.json \
+    --principal admin1 --request-id init1
 proof serve --config proof.json           # UDS service, SO_PEERCRED admission
-proof source register --file source.json --request-id rq-1 --config proof.json
+proof source register --source source.json --request-id rq-1 --config proof.json
 proof import stage --stage st1 --batch batch.json --request-id rq-2 --config proof.json
-proof import commit --stage st1 --request-id rq-3 --config proof.json
+# source.register made revision 1, so commit compares-and-swaps against it:
+proof import commit --stage st1 --expected-revision 1 \
+    --request-id rq-3 --config proof.json
 proof export --revision 2 --actions actions.json --include include.json \
     --out receipt.json --config proof.json
 proof verify --bundle receipt.json --trust trust.json --require ANCHORED \
     --as-of-unix-ms <ms>
 ```
+
+`--actions` is an `EventRef[]` file (`{source,stream,seq,hash}`) and
+`--include` a `Hash[]` file of object digests to embed; both may be `[]`.
+For `--require ANCHORED` the trust file's `heads` must pin the chain's live
+audit head and source cuts — `INTEGRITY` (signatures/hash-chain only) and
+`RECONSTRUCTION` accept the bundle without those pins. `--as-of-unix-ms`
+defaults to the verifier's wall clock when omitted.
 
 All output is canonical JSON. Verification of an exported bundle needs no
 service, no network, and no operator cooperation — only the bundle and an
