@@ -78,6 +78,12 @@ digits, underscores, or hyphens. Use the same ID in trust files. The `store`
 field selects the workspace's filesystem directory; relative config paths are
 resolved against the directory containing the config file.
 
+Run `proof serve --config proof.json` before `proof status` or other RPC
+commands. If the service cannot be reached, `status` can return retryable
+`STORAGE_UNAVAILABLE` with exit code 7; check that the daemon is running and
+that the configured socket is accessible. The same error can also indicate a
+storage problem. `proof verify` works offline without the daemon.
+
 ## Layout
 
 - `src/` — TypeScript core (canon, crypto, model, chain, replay, lineage,
