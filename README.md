@@ -50,6 +50,21 @@ helper, and Python ≥ 3.11 with `cryptography` for the Python suite.
 
 ## Quick start
 
+From a repository checkout, generate a starter configuration in a new
+directory and enter it (the generator requires Unix and refuses to overwrite an
+existing directory):
+
+```sh
+node examples/generate.mjs proof-workspace
+cd proof-workspace
+```
+
+This creates a fresh private audit key, initial and recovery trust files, and
+a config for the current Unix UID and GID. Keep the key private, review the
+configuration and trust policy for your deployment, and maintain independent
+trust pins for verification. The later import/export commands require your own
+source, batch, action, and include JSON files.
+
 ```sh
 proof init --config proof.json --trust trust/init.json \
     --principal admin1 --request-id init-1 # create workspace store + genesis audit
