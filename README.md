@@ -51,7 +51,8 @@ helper, and Python ≥ 3.11 with `cryptography` for the Python suite.
 ## Quick start
 
 ```sh
-proof init --config proof.json            # create workspace store + genesis audit
+proof init --config proof.json --trust trust/init.json \
+    --principal admin1 --request-id init-1 # create workspace store + genesis audit
 proof serve --config proof.json           # UDS service, SO_PEERCRED admission
 proof source register --file source.json --request-id rq-1 --config proof.json
 proof import stage --stage st1 --batch batch.json --request-id rq-2 --config proof.json
@@ -65,6 +66,11 @@ proof verify --bundle receipt.json --trust trust.json --require ANCHORED \
 All output is canonical JSON. Verification of an exported bundle needs no
 service, no network, and no operator cooperation — only the bundle and an
 independently maintained trust file.
+
+Before initialization, provide a valid config, an audit private key, and an
+initial trust file for the same workspace. The principal must be a configured
+admin; the request ID must be a valid ID. Any initial trust head pins must have
+sequence `0` and the all-zero genesis hash (or the head list may be empty).
 
 ## Layout
 
