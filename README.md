@@ -72,6 +72,12 @@ initial trust file for the same workspace. The principal must be a configured
 admin; the request ID must be a valid ID. Any initial trust head pins must have
 sequence `0` and the all-zero genesis hash (or the head list may be empty).
 
+The config's `workspace` is a logical ID, such as `ws1`, not a directory.
+It must start with an ASCII letter and contain at most 64 ASCII letters,
+digits, underscores, or hyphens. Use the same ID in trust files. The `store`
+field selects the workspace's filesystem directory; relative config paths are
+resolved against the directory containing the config file.
+
 ## Layout
 
 - `src/` — TypeScript core (canon, crypto, model, chain, replay, lineage,
