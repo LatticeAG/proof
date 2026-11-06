@@ -50,8 +50,24 @@ helper, and Python ≥ 3.11 with `cryptography` for the Python suite.
 
 ## Quick start
 
+From a repository checkout, generate a starter configuration in a new
+directory and enter it (the generator requires Unix and refuses to overwrite an
+existing directory):
+
 ```sh
-proof init --config proof.json            # create workspace store + genesis audit
+node examples/generate.mjs proof-workspace
+cd proof-workspace
+```
+
+This creates a fresh private audit key, initial and recovery trust files, and
+a config for the current Unix UID and GID. Keep the key private, review the
+configuration and trust policy for your deployment, and maintain independent
+trust pins for verification. The later import/export commands require your own
+source, batch, action, and include JSON files.
+
+```sh
+proof init --config proof.json --trust trust/init.json \
+    --principal admin1 --request-id init-1 # create workspace store + genesis audit
 proof serve --config proof.json           # UDS service, SO_PEERCRED admission
 proof source register --file source.json --request-id rq-1 --config proof.json
 proof import stage --stage st1 --batch batch.json --request-id rq-2 --config proof.json
@@ -65,6 +81,23 @@ proof verify --bundle receipt.json --trust trust.json --require ANCHORED \
 All output is canonical JSON. Verification of an exported bundle needs no
 service, no network, and no operator cooperation — only the bundle and an
 independently maintained trust file.
+
+Before initialization, provide a valid config, an audit private key, and an
+initial trust file for the same workspace. The principal must be a configured
+admin; the request ID must be a valid ID. Any initial trust head pins must have
+sequence `0` and the all-zero genesis hash (or the head list may be empty).
+
+The config's `workspace` is a logical ID, such as `ws1`, not a directory.
+It must start with an ASCII letter and contain at most 64 ASCII letters,
+digits, underscores, or hyphens. Use the same ID in trust files. The `store`
+field selects the workspace's filesystem directory; relative config paths are
+resolved against the directory containing the config file.
+
+Run `proof serve --config proof.json` before `proof status` or other RPC
+commands. If the service cannot be reached, `status` can return retryable
+`STORAGE_UNAVAILABLE` with exit code 7; check that the daemon is running and
+that the configured socket is accessible. The same error can also indicate a
+storage problem. `proof verify` works offline without the daemon.
 
 ## Layout
 
